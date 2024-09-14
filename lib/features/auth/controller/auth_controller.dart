@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,17 +29,6 @@ class AuthController {
     return user;
   }
 
-  void signInWithPhone(BuildContext context, String phoneNumber) {
-    authRepository.signInWithPhone(context, phoneNumber);
-  }
-
-  void verifyOTP(BuildContext context, String verificationId, String userOTP) {
-    authRepository.verifyOTP(
-      context: context,
-      verificationId: verificationId,
-      userOTP: userOTP,
-    );
-  }
 
   void saveUserDataToFirebase(
       BuildContext context, String name, File? profilePic) {
@@ -50,9 +40,12 @@ class AuthController {
     );
   }
 
-  Stream<UserModel> userDataById(String userId) {
-    return authRepository.userData(userId);
+  Stream<UserModel> userDataById(String uid) {
+    return FirebaseFirestore.instance.collection('users').doc(uid).snapshots().map(
+          (snapshot) => UserModel.fromMap(snapshot.data()!),
+    );
   }
+
 
   void setUserState(bool isOnline) {
     authRepository.setUserState(isOnline);

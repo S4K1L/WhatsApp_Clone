@@ -174,7 +174,7 @@ class ChatRepository {
         );
   }
 
-  void sendTextMessage({
+  sendTextMessage({
     required BuildContext context,
     required String text,
     required String recieverUserId,
@@ -220,10 +220,10 @@ class ChatRepository {
     }
   }
 
-  void sendFileMessage({
+  sendFileMessage({
     required BuildContext context,
     required File file,
-    required String recieverUserId,
+    required String receiverUserId,
     required UserModel senderUserData,
     required ProviderRef ref,
     required MessageEnum messageEnum,
@@ -236,13 +236,13 @@ class ChatRepository {
       String imageUrl = await ref
           .read(commonFirebaseStorageRepositoryProvider)
           .storeFileToFirebase(
-            'chat/${messageEnum.type}/${senderUserData.uid}/${recieverUserId}/${messageId}',
+            'chat/${messageEnum.type}/${senderUserData.uid}/${receiverUserId}/${messageId}',
             file,
           );
 
       UserModel? recieverUserData;
       var userDataMap =
-          await firestore.collection('users').doc(recieverUserId).get();
+          await firestore.collection('users').doc(receiverUserId).get();
       recieverUserData = UserModel.fromMap(userDataMap.data()!);
       String contactMsg;
 
@@ -269,10 +269,10 @@ class ChatRepository {
         recieverUserData,
         contactMsg,
         timeSent,
-        recieverUserId,
+        receiverUserId,
       );
       _saveMessageToMessageSubcollection(
-        recieverUserId: recieverUserId,
+        recieverUserId: receiverUserId,
         text: imageUrl,
         timeSent: timeSent,
         messageId: messageId,

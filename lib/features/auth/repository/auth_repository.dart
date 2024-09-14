@@ -30,57 +30,13 @@ class AuthRepository {
 
   Future<UserModel?> getCurrentUserData() async {
     var userData =
-        await firestore.collection('users').doc(auth.currentUser?.uid).get();
+    await firestore.collection('users').doc(auth.currentUser?.uid).get();
     UserModel? user;
 
     if (userData.data() != null) {
       user = UserModel.fromMap(userData.data()!);
     }
     return user;
-  }
-
-  void signInWithPhone(BuildContext context, String phoneNumber) async {
-    try {
-      await auth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await auth.signInWithCredential(credential);
-        },
-        verificationFailed: (e) {
-          throw Exception(e.message);
-        },
-        codeSent: ((String verificationId, int? resendToken) async {
-          Navigator.pushNamed(
-            // Navigator
-            context,
-            OTPScreen.routeName,
-            arguments: verificationId,
-          );
-        }),
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-    } on FirebaseAuthException catch (e) {
-      showSnackBar(context: context, content: e.message!);
-    }
-  }
-
-  void verifyOTP({
-    required BuildContext context,
-    required String verificationId,
-    required String userOTP,
-  }) async {
-    try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: verificationId, smsCode: userOTP);
-      await auth.signInWithCredential(credential);
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        UserInformationScreen.routeName,
-        (route) => false,
-      );
-    } on FirebaseAuthException catch (e) {
-      showSnackBar(context: context, content: e.message!);
-    }
   }
 
   void saveUserDataToFirebase({
@@ -97,9 +53,9 @@ class AuthRepository {
         photoUrl = await ref
             .read(commonFirebaseStorageRepositoryProvider)
             .storeFileToFirebase(
-              'profilePic/$uid',
-              profilePic,
-            );
+          'profilePic/$uid',
+          profilePic,
+        );
       }
 
       var user = UserModel(
@@ -107,7 +63,7 @@ class AuthRepository {
         uid: uid,
         profilePic: photoUrl,
         isOnline: true,
-        phoneNumber: auth.currentUser!.phoneNumber!,
+        email: auth.currentUser!.phoneNumber!,
         groupId: [],
       );
 
@@ -117,7 +73,7 @@ class AuthRepository {
         MaterialPageRoute(
           builder: (context) => const MobileLayoutScreen(),
         ),
-        (route) => false,
+            (route) => false,
       );
     } catch (e) {
       showSnackBar(context: context, content: e.toString());
@@ -127,9 +83,9 @@ class AuthRepository {
   Stream<UserModel> userData(String userId) {
     return firestore.collection('users').doc(userId).snapshots().map(
           (event) => UserModel.fromMap(
-            event.data()!,
-          ),
-        );
+        event.data()!,
+      ),
+    );
   }
 
   void setUserState(bool isOnline) async {
@@ -138,6 +94,7 @@ class AuthRepository {
     });
   }
 }
+
 
 
 // Navigator

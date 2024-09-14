@@ -10,6 +10,7 @@ class MobileChatScreen extends ConsumerWidget {
   static const String routeName = '/mobile-chat-screen';
   final String name;
   final String uid;
+
   const MobileChatScreen({
     Key? key,
     required this.name,
@@ -25,13 +26,18 @@ class MobileChatScreen extends ConsumerWidget {
           stream: ref.read(authControllerProvider).userDataById(uid),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
+              return const CircularProgressIndicator(); // Show loading indicator while waiting for data
             }
+            if (!snapshot.hasData || snapshot.data == null) {
+              return Text(name); // Fallback to show just the name if no user data is available
+            }
+            final user = snapshot.data!; // Safely access user data
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name),
                 Text(
-                  snapshot.data!.isOnline ? 'online' : 'offline',
+                  user.isOnline ? 'online' : 'offline',
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.normal,
@@ -75,18 +81,28 @@ class MobileChatScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ChatList(
-              recieverUserId: uid,
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/backgroundImage.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: ChatList(
+                receiverUserId: uid,
+              ),
             ),
-          ),
-          BottomChatField(
-            recieverUserId: uid,
-          ),
-        ],
+            BottomChatField(
+              receiverUserId: uid,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+

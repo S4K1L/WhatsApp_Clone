@@ -1,6 +1,5 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:cached_video_player/cached_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 class VideoPlayerItem extends StatefulWidget {
   final String videoUrl;
@@ -14,46 +13,49 @@ class VideoPlayerItem extends StatefulWidget {
 }
 
 class _VideoPlayerItemState extends State<VideoPlayerItem> {
-  late CachedVideoPlayerController videoPlayerController;
+  late VideoPlayerController videoPlayerController;
   bool isPlay = false;
 
   @override
   void initState() {
     super.initState();
-    videoPlayerController = CachedVideoPlayerController.network(widget.videoUrl)
-      ..initialize().then((value) {
-        videoPlayerController.setVolume(1);
+    videoPlayerController = VideoPlayerController.network(widget.videoUrl)
+      ..initialize().then((_) {
+        setState(() {}); // Ensures the first frame is shown after the video is initialized
+        videoPlayerController.setVolume(1.0);
       });
   }
 
   @override
   void dispose() {
-    super.dispose();
     videoPlayerController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 16 / 9,
+      aspectRatio: videoPlayerController.value.aspectRatio,
       child: Stack(
         children: [
-          CachedVideoPlayer(videoPlayerController),
+          VideoPlayer(videoPlayerController),
           Align(
             alignment: Alignment.center,
             child: IconButton(
               onPressed: () {
-                if (isPlay) {
-                  videoPlayerController.pause();
-                } else {
-                  videoPlayerController.play();
-                }
                 setState(() {
+                  if (isPlay) {
+                    videoPlayerController.pause();
+                  } else {
+                    videoPlayerController.play();
+                  }
                   isPlay = !isPlay;
                 });
               },
               icon: Icon(
                 isPlay ? Icons.pause_circle : Icons.play_circle,
+                size: 50,
+                color: Colors.white,
               ),
             ),
           ),

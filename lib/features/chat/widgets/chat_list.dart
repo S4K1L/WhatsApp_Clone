@@ -14,10 +14,10 @@ import 'package:whatsapp_clone_app/model/message.dart';
 import 'my_message_card.dart';
 
 class ChatList extends ConsumerStatefulWidget {
-  final String recieverUserId;
+  final String receiverUserId;
   const ChatList({
     Key? key,
-    required this.recieverUserId,
+    required this.receiverUserId,
   }) : super(key: key);
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ChatListState();
@@ -30,6 +30,12 @@ class _ChatListState extends ConsumerState<ChatList> {
   void dispose() {
     super.dispose();
     messageController.dispose();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
   }
 
   void onMessageSwipe(
@@ -48,17 +54,37 @@ class _ChatListState extends ConsumerState<ChatList> {
 
   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, authSnapshot) {
+        if (authSnapshot.connectionState == ConnectionState.waiting) {
+          // Show loading state until FirebaseAuth confirms the user is logged in
+          return const Loader();
+        }
+
+        if (authSnapshot.hasData) {
+          // If the user is authenticated, proceed to the chat list
+          return buildChatList();
+        } else {
+          // If the user is not authenticated, redirect to login screen or show an error
+          return const Center(child: Text('User not logged in.'));
+        }
+      },
+    );
+  }
+
+  Widget buildChatList() {
     return StreamBuilder<List<Message>>(
-        stream:
-            ref.read(ChatControllerProvider).chatStream(widget.recieverUserId),
+        stream: ref.read(chatControllerProvider).chatStream(widget.receiverUserId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Loader();
           }
 
           SchedulerBinding.instance.addPostFrameCallback((_) {
-            messageController
-                .jumpTo(messageController.position.maxScrollExtent);
+            if (messageController.hasClients) {
+              messageController.jumpTo(messageController.position.maxScrollExtent);
+            }
           });
 
           return ListView.builder(
@@ -67,8 +93,8 @@ class _ChatListState extends ConsumerState<ChatList> {
             itemBuilder: (context, index) {
               final messageData = snapshot.data![index];
               var timeSent = DateFormat.Hm().format(messageData.timeSent);
-              if (messageData.senderId ==
-                  FirebaseAuth.instance.currentUser!.uid) {
+
+              if (messageData.senderId == FirebaseAuth.instance.currentUser!.uid) {
                 return MyMessageCard(
                   message: messageData.text,
                   date: timeSent,
@@ -80,6 +106,7 @@ class _ChatListState extends ConsumerState<ChatList> {
                       onMessageSwipe(messageData.text, true, messageData.type),
                 );
               }
+
               return SenderMessageCard(
                 message: messageData.text,
                 date: timeSent,
@@ -94,4 +121,5 @@ class _ChatListState extends ConsumerState<ChatList> {
           );
         });
   }
+
 }

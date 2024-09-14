@@ -3,7 +3,7 @@ class UserModel {
   final String uid;
   final String profilePic;
   final bool isOnline;
-  final String phoneNumber;
+  final String email;
   final List<String> groupId;
 
   UserModel({
@@ -11,29 +11,35 @@ class UserModel {
     required this.uid,
     required this.profilePic,
     required this.isOnline,
-    required this.phoneNumber,
+    required this.email,
     required this.groupId,
   });
 
+  // Convert UserModel object to a map for Firestore or other storage
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'name': name,
       'uid': uid,
       'profilePic': profilePic,
       'isOnline': isOnline,
-      'phoneNumber': phoneNumber,
+      'email': email,
       'groupId': groupId,
     };
   }
 
+  // Factory constructor to create a UserModel from a map
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       name: map['name'] ?? '',
       uid: map['uid'] ?? '',
       profilePic: map['profilePic'] ?? '',
       isOnline: map['isOnline'] ?? false,
-      phoneNumber: map['phoneNumber'] ?? '',
-      groupId: List<String>.from(map['groupId']),
+      email: map['email'] ?? '',
+      groupId: map['groupId'] != null
+          ? List<String>.from(map['groupId'])
+          : <String>[],
     );
   }
+
+
 }

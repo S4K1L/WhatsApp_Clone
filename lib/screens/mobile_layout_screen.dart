@@ -9,6 +9,7 @@ import 'Community/community_screen.dart';
 import 'Updates/update_screen.dart';
 
 class MobileLayoutScreen extends ConsumerStatefulWidget {
+  static const String routeName = '/MobileLayoutScreen';
   const MobileLayoutScreen({Key? key}) : super(key: key);
 
   @override

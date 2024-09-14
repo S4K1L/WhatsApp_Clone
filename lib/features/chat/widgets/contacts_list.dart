@@ -20,7 +20,7 @@ class ContactsList extends ConsumerWidget {
         title: const Text(
           'WhatsApp',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 24,
             color: tabColor,
             fontWeight: FontWeight.bold,
           ),
@@ -53,7 +53,7 @@ class ContactsList extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.only(top: 10.0),
           child: StreamBuilder<List<ChatContact>>(
-            stream: ref.watch(ChatControllerProvider).chatContacts(),
+            stream: ref.watch(chatControllerProvider).chatContacts(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Loader();

@@ -51,7 +51,7 @@ class SelectContactRepository {
 
         await Future.delayed(const Duration(seconds: 60));
 
-        if (selectedPhoneNum == userData.phoneNumber) {
+        if (selectedPhoneNum == userData.email) {
           isFound = true;
           Navigator.pushNamed(
             context,

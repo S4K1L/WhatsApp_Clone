@@ -9,13 +9,6 @@ class OTPScreen extends ConsumerWidget {
   final String verificationId;
   const OTPScreen({Key? key, required this.verificationId}) : super(key: key);
 
-  void verifyOTP(WidgetRef ref, BuildContext context, String userOTP) {
-    ref.read(authControllerProvider).verifyOTP(
-          context,
-          verificationId,
-          userOTP,
-        );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,7 +45,7 @@ class OTPScreen extends ConsumerWidget {
                   keyboardType: TextInputType.number,
                   onChanged: (val) {
                     if (val.length == 6) {
-                      verifyOTP(ref, context, val.trim());
+                      //verifyOTP(ref, context, val.trim());
                     }
                   },
                 ),
